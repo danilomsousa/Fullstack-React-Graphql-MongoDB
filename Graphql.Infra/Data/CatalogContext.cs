@@ -15,8 +15,7 @@
 
             this.database = client.GetDatabase(mongoDbConfiguration.Database);
 
-            this.venuesApiService = venuesApiService;
-            //CatalogContextSeed.SeedData(this.database, venuesApiService);
+            this.venuesApiService = venuesApiService;            
         }
 
         public IMongoCollection<T> GetCollection<T>(string name)

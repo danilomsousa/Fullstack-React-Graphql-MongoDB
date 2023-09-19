@@ -22,7 +22,7 @@
             venues = await venuesApiService.GetVenuesAsync();
             System.Console.WriteLine("Received {0} venues.", venues.venues.Count);
 
-            if(categoriesId != null) categoriesId = new Dictionary<string, ObjectId>();
+            if(categoriesId == null) categoriesId = new Dictionary<string, ObjectId>();
 
             InsertCategories(database.GetCollection<Category>(nameof(Category)));
             InsertVenues(database.GetCollection<Venue>(nameof(Venue)));
@@ -43,9 +43,12 @@
             var categoriesList = new List<Category>();                        
             foreach(var venue in venues.venues){
                 if(!categoriesId.ContainsKey(venue.category.ToUpper())){
-                    categoriesId.Add(venue.category.ToUpper(), ObjectId.GenerateNewId());
-                    categoriesList.Add(new Category{ Id = categoriesId[venue.category.ToUpper()].ToString(), Description = venue.category});                
-                }                
+                    categoriesId.Add(venue.category.ToUpper(), ObjectId.GenerateNewId());                    
+                }         
+            }
+
+            foreach(var category in categoriesId){
+                categoriesList.Add(new Category { Id = category.Value.ToString(), Description = category.Key});
             }
 
             if(categoriesList.Count > 0) categoryCollection.InsertManyAsync(categoriesList);

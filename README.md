@@ -1,7 +1,22 @@
-# Project created 
+# Personnal Project 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was developed to a technical interview. 
+The goal was to have a Full Stack application using React as Frontend and a Backend running with a GraphQL and a MongoDB.
 
-## Available Scripts
+The solution provides a simple portal that shows information from a 3rd party RestAPI working as a middleware.
 
-In the project directory, you can run:
+## Test solution
+
+Backend: In the root directory, you can use Docker to process the solution running: 
+
+### `docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d`
+
+The graphQL will be available on: [http://localhost:9006/api/graphql/] (http://localhost:9006/api/graphql/)
+
+
+Frontend: In the react-app directory, run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.

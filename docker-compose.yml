@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  catalogdb:
+    image: mongo
+
+  graphql.api:
+    image: ${DOCKER_REGISTRY-}graphqlapi
+    build:
+      context: .
+      dockerfile: Dockerfile
