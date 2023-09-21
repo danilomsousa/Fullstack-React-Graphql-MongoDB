@@ -1,10 +1,11 @@
-
-
 using GraphQL.Infra.Configurations;
 
+/// <summary>
+/// Class <c>ApiConfiguration</c> provides the configuration from AppSettings file.
+/// </summary>
 public class ApiConfiguration
 {
-    public MongoDbConfiguration MongoDbConfiguration { get; set; }
+    public required MongoDbConfiguration MongoDbConfiguration { get; set; }
 
-    public ApiServiceConfiguration ApiServiceConfiguration { get; set;}
+    public required ApiServiceConfiguration ApiServiceConfiguration { get; set;}
 }

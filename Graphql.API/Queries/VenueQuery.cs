@@ -7,6 +7,9 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Class <c>VenueQuery</c> provides the Venue queries available on GraphQL.
+    /// </summary>
     [ExtendObjectType(Name = "Query")]
     public class VenueQuery
     {

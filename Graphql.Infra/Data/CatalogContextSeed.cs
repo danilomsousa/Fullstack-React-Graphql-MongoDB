@@ -7,38 +7,49 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Class <c>CatalogContextSeed</c> provides the load from external API to MongoDB.
+    /// </summary>
     public class CatalogContextSeed
     {
-        public static VenuesResponse venues;
-        public static Dictionary<string, ObjectId> categoriesId;
+        /// <summary>
+        /// Dictionary <c>categoriesId</c> provides the list of Categories and the IDs.
+        /// </summary>
+        public static Dictionary<string, ObjectId> categoriesId = new Dictionary<string, ObjectId>();
+
+        /// <summary>
+        /// int <c>batchSize</c> provides the size of batch to be inserted on MongoDB.
+        /// </summary>
         public static int batchSize = 500;
+
         public async static void SeedData(IMongoDatabase database, IVenuesApiService venuesApiService)
         {         
 
             System.Console.WriteLine("Starting seedData.");
             var watch = new System.Diagnostics.Stopwatch();
             
-            watch.Start();           
-            venues = await venuesApiService.GetVenuesAsync();
-            System.Console.WriteLine("Received {0} venues.", venues.venues.Count);
+            watch.Start();
+            VenuesResponse venues = await venuesApiService.GetVenuesAsync();
 
-            if(categoriesId == null) categoriesId = new Dictionary<string, ObjectId>();
+            if(venues.venues == null || venues.venues.Count == 0) 
+                throw new NullReferenceException("External Service GetVenuesAsync returns null value");
 
-            InsertCategories(database.GetCollection<Category>(nameof(Category)));
-            InsertVenues(database.GetCollection<Venue>(nameof(Venue)));
+            System.Console.WriteLine("Received {0} venues.", venues.venues.Count);                        
+
+            InsertCategories(database.GetCollection<Category>(nameof(Category)), venues);
+            InsertVenues(database.GetCollection<Venue>(nameof(Venue)), venues);
 
             watch.Stop();
             Console.WriteLine("Finished seedData, elapsed Time is {0} ms", watch.ElapsedMilliseconds);
         }
 
-        private static void InsertCategories(IMongoCollection<Category> categoryCollection)
+        private static void InsertCategories(IMongoCollection<Category> categoryCollection, VenuesResponse venues)
         {
             categoryCollection.DeleteMany(_ => true);
-            categoriesInsertList(categoryCollection);           
+            categoriesInsertList(categoryCollection, venues);           
         }
-
-        [Obsolete]
-        private static void categoriesInsertList(IMongoCollection<Category> categoryCollection)
+                
+        private static void categoriesInsertList(IMongoCollection<Category> categoryCollection, VenuesResponse venues)
         {          
             var categoriesList = new List<Category>();                        
             foreach(var venue in venues.venues){
@@ -54,13 +65,13 @@
             if(categoriesList.Count > 0) categoryCollection.InsertManyAsync(categoriesList);
         }
 
-        private static void InsertVenues(IMongoCollection<Venue> venueCollection)
+        private static void InsertVenues(IMongoCollection<Venue> venueCollection, VenuesResponse venues)
         {
             venueCollection.DeleteMany(_ => true);
-            venuesInsertList(venueCollection);            
+            venuesInsertList(venueCollection, venues);            
         }
 
-        private static void venuesInsertList(IMongoCollection<Venue> venueCollection)
+        private static void venuesInsertList(IMongoCollection<Venue> venueCollection, VenuesResponse venues)
         {            
             var venuesList = new List<Venue>(); 
             var countLoop = 0;           

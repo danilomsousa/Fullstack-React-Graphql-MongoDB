@@ -9,67 +9,72 @@ using GraphQL.Infra.Connector;
 
 namespace GraphQL.API
 {
+    /// <summary>
+    /// Class <c>Startup</c> sets the initial configuration for the API.
+    /// </summary>
     public class Startup
     {
 
-    private readonly ApiConfiguration apiConfiguration;
+        private readonly ApiConfiguration apiConfiguration;
+        
         // Constructor
-    public Startup(IConfiguration configuration)
-    {        
-        this.apiConfiguration = configuration.Get<ApiConfiguration>();
-    }
-
-    public void ConfigureServices(IServiceCollection services)
-    {
-        // Configurations
-        services.AddSingleton(this.apiConfiguration.MongoDbConfiguration);
-        services.AddSingleton(this.apiConfiguration.ApiServiceConfiguration);
-
-        // Repositories
-        services.AddSingleton<ICatalogContext, CatalogContext>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IVenueRepository, VenueRepository>();
-        services.AddSingleton<IVenuesApiService, VenuesApiService>();
-
-        //Add Cors    
-        services.AddCors(options =>
-        {
-        options.AddDefaultPolicy(
-            builder =>
-            {
-                builder.WithOrigins("*")
-                    .AllowAnyHeader();
-            });
-        });
-
-        // GraphQL
-        services
-            .AddGraphQLServer()
-            .AddQueryType(d => d.Name("Query"))
-                        .AddTypeExtension<VenueQuery>()  
-                        .AddTypeExtension<CategoryQuery>()                  
-            .AddType<VenueType>()
-            .AddType<CategoryResolver>();
-
-        services.AddHostedService<Worker>();
-
-    }
-
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
+        public Startup(IConfiguration configuration)
+        {        
+            this.apiConfiguration = configuration.Get<ApiConfiguration>();
         }
 
-        app.UseRouting();
-
-        app.UseCors();
-
-        app.UseEndpoints(endpoints =>
+        public void ConfigureServices(IServiceCollection services)
         {
-            endpoints.MapGraphQL("/api/graphql");
-        });
+            // Configurations
+            services.AddSingleton(this.apiConfiguration.MongoDbConfiguration);
+            services.AddSingleton(this.apiConfiguration.ApiServiceConfiguration);
+
+            // Repositories
+            services.AddSingleton<ICatalogContext, CatalogContext>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IVenueRepository, VenueRepository>();
+            services.AddSingleton<IVenuesApiService, VenuesApiService>();
+
+            //Add Cors    
+            services.AddCors(options =>
+            {
+            options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder.WithOrigins("*")
+                        .AllowAnyHeader();
+                });
+            });
+
+            // GraphQL
+            services
+                .AddGraphQLServer()
+                .AddQueryType(d => d.Name("Query"))
+                            .AddTypeExtension<VenueQuery>()  
+                            .AddTypeExtension<CategoryQuery>()                  
+                .AddType<VenueType>()
+                .AddType<CategoryResolver>();
+
+            // Worker for reload DB
+            services.AddHostedService<Worker>();
+
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseRouting();
+
+            app.UseCors();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGraphQL("/api/graphql");
+            });
         }
     }
 }

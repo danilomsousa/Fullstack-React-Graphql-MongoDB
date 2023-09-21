@@ -7,6 +7,9 @@ namespace GraphQL.API.Queries
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Class <c>CategoryQuery</c> provides the Category queries available on GraphQL.
+    /// </summary>
     [ExtendObjectType(Name = "Query")]
     public class CategoryQuery
     {
